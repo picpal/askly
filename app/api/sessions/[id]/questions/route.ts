@@ -36,7 +36,7 @@ export async function GET(
     // 쿼리 빌드
     let query = supabase
       .from("questions")
-      .select("id, session_id, author_id, author_nickname, content, is_private, is_pinned, thumb_count, created_at, updated_at", { count: "exact" })
+      .select("id, session_id, author_id, author_nickname, content, is_private, is_pinned, thumb_count, created_at", { count: "exact" })
       .eq("session_id", sessionId);
 
     // 비공개 질문 필터링: admin이 아닌 경우 자기 것만 + 공개 질문
@@ -73,7 +73,6 @@ export async function GET(
       isPinned: q.is_pinned,
       thumbCount: q.thumb_count,
       createdAt: q.created_at,
-      updatedAt: q.updated_at,
     }));
 
     return NextResponse.json({

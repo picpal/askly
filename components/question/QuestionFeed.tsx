@@ -19,11 +19,14 @@ export default function QuestionFeed({
 }: QuestionFeedProps) {
   const { questions, setQuestions, sortBy, setSortBy } = useQuestionStore();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['questions', sessionId],
     queryFn: () => getQuestions(sessionId),
     refetchInterval: 5000,
   });
+
+  // 최초 로딩: 캐시된 데이터가 없고 로딩 중일 때만 스켈레톤 표시
+  const isInitialLoading = isLoading && !data;
 
   useEffect(() => {
     if (data) {
@@ -86,7 +89,7 @@ export default function QuestionFeed({
         </div>
       </div>
 
-      {isLoading ? (
+      {isInitialLoading ? (
         <div className="space-y-3" aria-label="질문 로딩 중">
           <SkeletonCard />
           <SkeletonCard />

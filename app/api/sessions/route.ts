@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { encryptApiKey } from "@/lib/crypto/encrypt";
 import { mintToken } from "@/lib/auth/jwt";
@@ -18,33 +19,22 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Supabase 익명 인증
+    // Supabase 익명 인증 (anon key 클라이언트 사용)
+    const anonClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        email: undefined,
-        phone: undefined,
-        // 익명 사용자 생성을 위해 빈 객체로 생성
-      });
+      await anonClient.auth.signInAnonymously();
 
-    // 익명 인증이 안 될 경우 UUID 직접 생성으로 폴백
-    let authId: string;
     if (authError || !authData?.user) {
-      // service role로 직접 auth user 생성
-      const { data: anonData, error: anonError } =
-        await supabase.auth.admin.createUser({
-          user_metadata: { anonymous: true },
-          email_confirm: true,
-        });
-      if (anonError || !anonData?.user) {
-        return NextResponse.json(
-          { error: "Failed to create anonymous user" },
-          { status: 500 }
-        );
-      }
-      authId = anonData.user.id;
-    } else {
-      authId = authData.user.id;
+      return NextResponse.json(
+        { error: "Failed to create anonymous user", details: authError?.message },
+        { status: 500 }
+      );
     }
+
+    const authId = authData.user.id;
 
     // 6자리 코드 생성 (중복 확인)
     let code = generateSessionCode();

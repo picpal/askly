@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mintToken } from "@/lib/auth/jwt";
 
@@ -41,16 +42,17 @@ export async function POST(
       );
     }
 
-    // Supabase 익명 인증
+    // Supabase 익명 인증 (anon key 클라이언트 사용)
+    const anonClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        user_metadata: { anonymous: true },
-        email_confirm: true,
-      });
+      await anonClient.auth.signInAnonymously();
 
     if (authError || !authData?.user) {
       return NextResponse.json(
-        { error: "Failed to create anonymous user" },
+        { error: "Failed to create anonymous user", details: authError?.message },
         { status: 500 }
       );
     }
