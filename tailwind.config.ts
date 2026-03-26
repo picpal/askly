@@ -7,7 +7,14 @@ const config: Config = {
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        slideIn: 'slideIn 0.3s ease-out',
+        bounceCount: 'bounceCount 0.3s ease-in-out',
+        slideInRight: 'slideInRight 0.3s ease-out',
+        slideOutRight: 'slideOutRight 0.3s ease-in forwards',
+      },
+    },
   },
   plugins: [],
 };

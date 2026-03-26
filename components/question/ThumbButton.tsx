@@ -34,6 +34,7 @@ export default function ThumbButton({
   const [count, setCount] = useState(thumbCount);
   const [hasThumbed, setHasThumbed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [bouncing, setBouncing] = useState(false);
 
   useEffect(() => {
     setHasThumbed(getThumbedIds().has(questionId));
@@ -54,6 +55,8 @@ export default function ThumbButton({
     try {
       await addThumb(questionId);
       saveThumbedId(questionId);
+      setBouncing(true);
+      setTimeout(() => setBouncing(false), 300);
       onThumbAdded?.(questionId);
     } catch {
       // Revert on error
@@ -68,9 +71,11 @@ export default function ThumbButton({
     <button
       onClick={handleClick}
       disabled={hasThumbed || loading}
+      aria-label={`공감 ${count}개${hasThumbed ? ', 이미 공감함' : ''}`}
+      aria-pressed={hasThumbed}
       className={`
         inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
-        transition-colors
+        transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
         ${
           hasThumbed
             ? 'bg-blue-100 text-blue-600 cursor-default'
@@ -79,8 +84,8 @@ export default function ThumbButton({
         disabled:cursor-not-allowed
       `}
     >
-      <span className="text-base">👍</span>
-      <span>{count}</span>
+      <span className="text-base" aria-hidden="true">👍</span>
+      <span className={bouncing ? 'animate-bounceCount' : ''}>{count}</span>
     </button>
   );
 }

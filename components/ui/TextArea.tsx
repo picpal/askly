@@ -29,10 +29,13 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           id={inputId}
           maxLength={maxLength}
           value={value}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${inputId}-error` : undefined}
           className={`
             w-full rounded-lg border px-3 py-2 text-sm
             placeholder:text-gray-400 resize-none
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            focus-visible:ring-2 focus-visible:ring-blue-500
             disabled:bg-gray-100 disabled:cursor-not-allowed
             ${error ? 'border-red-500' : 'border-gray-300'}
             ${className}
@@ -41,7 +44,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         />
         <div className="flex justify-between mt-1">
           {error ? (
-            <p className="text-sm text-red-500">{error}</p>
+            <p id={`${inputId}-error`} className="text-sm text-red-500" role="alert">{error}</p>
           ) : (
             <span />
           )}

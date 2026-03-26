@@ -22,17 +22,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${inputId}-error` : undefined}
           className={`
             w-full rounded-lg border px-3 py-2 text-sm
             placeholder:text-gray-400
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            focus-visible:ring-2 focus-visible:ring-blue-500
             disabled:bg-gray-100 disabled:cursor-not-allowed
             ${error ? 'border-red-500' : 'border-gray-300'}
             ${className}
           `}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {error && <p id={`${inputId}-error`} className="mt-1 text-sm text-red-500" role="alert">{error}</p>}
       </div>
     );
   }

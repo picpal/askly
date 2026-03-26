@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getQuestions } from '@/lib/api/questions';
 import { useQuestionStore } from '@/store/questionStore';
 import QuestionCard from './QuestionCard';
+import EmptyState from '@/components/ui/EmptyState';
+import SkeletonCard from '@/components/ui/SkeletonCard';
 import { useEffect, useMemo } from 'react';
 
 interface QuestionFeedProps {
@@ -49,15 +51,18 @@ export default function QuestionFeed({
   };
 
   return (
-    <div>
+    <div aria-live="polite">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
           질문 ({questions.length})
         </h3>
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1" role="tablist" aria-label="정렬 방식">
           <button
+            role="tab"
+            aria-selected={sortBy === 'latest'}
+            aria-label="최신순 정렬"
             onClick={() => setSortBy('latest')}
-            className={`px-3 py-1 text-sm rounded-md transition-colors ${
+            className={`px-3 py-1 text-sm rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               sortBy === 'latest'
                 ? 'bg-white text-gray-900 shadow-sm font-medium'
                 : 'text-gray-500 hover:text-gray-700'
@@ -66,8 +71,11 @@ export default function QuestionFeed({
             최신순
           </button>
           <button
+            role="tab"
+            aria-selected={sortBy === 'popular'}
+            aria-label="인기순 정렬"
             onClick={() => setSortBy('popular')}
-            className={`px-3 py-1 text-sm rounded-md transition-colors ${
+            className={`px-3 py-1 text-sm rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               sortBy === 'popular'
                 ? 'bg-white text-gray-900 shadow-sm font-medium'
                 : 'text-gray-500 hover:text-gray-700'
@@ -79,24 +87,24 @@ export default function QuestionFeed({
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8 text-gray-400">
-          질문을 불러오는 중...
+        <div className="space-y-3" aria-label="질문 로딩 중">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       ) : sortedQuestions.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <p className="text-lg mb-1">아직 질문이 없습니다</p>
-          <p className="text-sm">첫 번째 질문을 남겨보세요!</p>
-        </div>
+        <EmptyState />
       ) : (
         <div className="space-y-3">
           {sortedQuestions.map((question) => (
-            <QuestionCard
-              key={question.id}
-              question={question}
-              onThumbAdded={handleThumbAdded}
-            >
-              {renderCardExtra?.(question.id)}
-            </QuestionCard>
+            <div key={question.id} className="animate-slideIn">
+              <QuestionCard
+                question={question}
+                onThumbAdded={handleThumbAdded}
+              >
+                {renderCardExtra?.(question.id)}
+              </QuestionCard>
+            </div>
           ))}
         </div>
       )}
