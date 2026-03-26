@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import QuestionFeed from '@/components/question/QuestionFeed';
 import AnswerComposer from './AnswerComposer';
+import AIDraftCard from './AIDraftCard';
 import { fetchWithAuth } from '@/lib/api/client';
 import { useCallback } from 'react';
 
@@ -29,7 +30,10 @@ export default function AdminPanel({ sessionId }: AdminPanelProps) {
 
   const renderCardExtra = useCallback(
     (questionId: string) => (
-      <AnswerComposer questionId={questionId} onAnswered={handleAnswered} />
+      <>
+        <AIDraftCard questionId={questionId} />
+        <AnswerComposer questionId={questionId} onAnswered={handleAnswered} />
+      </>
     ),
     [handleAnswered]
   );

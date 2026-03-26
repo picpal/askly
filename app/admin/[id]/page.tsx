@@ -5,12 +5,39 @@ import { useSessionStore } from '@/store/sessionStore';
 import AdminPanel from '@/components/admin/AdminPanel';
 import QRCodeDisplay from '@/components/session/QRCodeDisplay';
 import SessionCodeBadge from '@/components/session/SessionCodeBadge';
+import RealtimeProvider from '@/components/providers/RealtimeProvider';
+import { usePresence } from '@/lib/realtime/usePresence';
 import Link from 'next/link';
 
 export default function AdminPage() {
   const params = useParams();
   const sessionId = params.id as string;
-  const { session } = useSessionStore();
+  const { session, user } = useSessionStore();
+
+  return (
+    <RealtimeProvider sessionId={sessionId}>
+      <AdminPageContent
+        sessionId={sessionId}
+        session={session}
+        userId={user?.id ?? ''}
+        nickname={user?.nickname ?? ''}
+      />
+    </RealtimeProvider>
+  );
+}
+
+function AdminPageContent({
+  sessionId,
+  session,
+  userId,
+  nickname,
+}: {
+  sessionId: string;
+  session: { title: string; description?: string; code: string } | null;
+  userId: string;
+  nickname: string;
+}) {
+  const { participantCount } = usePresence(sessionId, userId, nickname);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -22,6 +49,9 @@ export default function AdminPage() {
               {session?.title || '관리자 대시보드'}
             </h1>
             {session?.code && <SessionCodeBadge code={session.code} />}
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+              참여자 {participantCount}명
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Link

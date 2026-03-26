@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/lib/auth/middleware";
 import { AuthError } from "@/lib/auth/middleware";
+import { generateDraft } from "@/lib/ai/generate-draft";
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,6 +67,9 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // fire-and-forget: AI 초안 생성 (응답을 블로킹하지 않음)
+    generateDraft(question.id).catch(console.error);
 
     return NextResponse.json(
       {
