@@ -1,2 +1,12 @@
 .baton/logs/
 .baton/reports/
+
+# dependencies
+node_modules/
+
+# next.js
+.next/
+
+# environment variables
+.env.local
+.env
