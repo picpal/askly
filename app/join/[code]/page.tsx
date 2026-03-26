@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import JoinPageClient from './JoinPageClient';
 
 interface JoinPageProps {
@@ -5,7 +6,10 @@ interface JoinPageProps {
 }
 
 async function getSession(code: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  const baseUrl = `${protocol}://${host}`;
   try {
     const res = await fetch(`${baseUrl}/api/sessions/code/${code}`, {
       cache: 'no-store',
